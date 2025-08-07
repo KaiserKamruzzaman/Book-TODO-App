@@ -1,56 +1,57 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent } from "@/components/ui/card"
-import { Trash2, BookOpen, BookCheck } from "lucide-react"
-import type { Book } from "@prisma/client"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent } from "@/components/ui/card";
+import { Trash2, BookOpen, BookCheck } from "lucide-react";
+import type { Book } from "@prisma/client";
 
 interface BookItemProps {
-  book: Book
-  onBookUpdated: () => void
+  book: Book;
+  onBookUpdated: () => void;
 }
 
 export function BookItem({ book, onBookUpdated }: BookItemProps) {
-  const [isUpdating, setIsUpdating] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleToggleCompletion = async () => {
-    setIsUpdating(true)
+    setIsUpdating(true);
 
     try {
       const response = await fetch(`/api/books/${book.id}`, {
         method: "PATCH",
-      })
+      });
 
       if (response.ok) {
-        onBookUpdated()
+        onBookUpdated();
       }
     } catch (error) {
-      console.error("Failed to update book:", error)
+      console.error("Failed to update book:", error);
     } finally {
-      setIsUpdating(false)
+      setIsUpdating(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    setIsDeleting(true)
+    console.log(book.id);
+    setIsDeleting(true);
 
     try {
       const response = await fetch(`/api/books/${book.id}`, {
         method: "DELETE",
-      })
+      });
 
       if (response.ok) {
-        onBookUpdated()
+        onBookUpdated();
       }
     } catch (error) {
-      console.error("Failed to delete book:", error)
+      console.error("Failed to delete book:", error);
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   return (
     <Card className={`transition-all ${book.completed ? "opacity-75" : ""}`}>
@@ -82,12 +83,16 @@ export function BookItem({ book, onBookUpdated }: BookItemProps) {
                 </label>
                 <p
                   className={`text-sm ${
-                    book.completed ? "line-through text-muted-foreground" : "text-muted-foreground"
+                    book.completed
+                      ? "line-through text-muted-foreground"
+                      : "text-muted-foreground"
                   }`}
                 >
                   by {book.author}
                 </p>
-                <p className="text-xs text-muted-foreground">Added {new Date(book.createdAt).toLocaleDateString()}</p>
+                <p className="text-xs text-muted-foreground">
+                  Added {new Date(book.createdAt).toLocaleDateString()}
+                </p>
               </div>
             </div>
           </div>
@@ -105,5 +110,5 @@ export function BookItem({ book, onBookUpdated }: BookItemProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
