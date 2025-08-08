@@ -1,42 +1,33 @@
-version: "3.8"
+version: "3.9"
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: book-todo-postgres
+  book-todo-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - ./:/app # Bind mount source code for live reload
+      - /app/node_modules # Prevent overwrite of node_modules by bind mount
+    command: sh -c "yarn prisma migrate deploy && yarn dev"
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: book_todo_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: your_secure_password
-      POSTGRES_HOST_AUTH_METHOD: trust
+
+  db:
+    image: postgres:15
     ports:
       - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: book_todo_db_doc
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d book_todo_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-#   # Optional: pgAdmin for database management
-#   pgadmin:
-#     image: dpage/pgadmin4:latest
-#     container_name: book-todo-pgadmin
-#     restart: unless-stopped
-#     environment:
-#       PGADMIN_DEFAULT_EMAIL: admin@example.com
-#       PGADMIN_DEFAULT_PASSWORD: admin123
-#       PGADMIN_CONFIG_SERVER_MODE: 'False'
-#     ports:
-#       - "8080:80"
-#     volumes:
-#       - pgadmin_data:/var/lib/pgadmin
-#     depends_on:
-#       postgres:
-#         condition: service_healthy
+      - /Users/nahidkaiser/NK/pgdata:/var/lib/postgresql/data
 
-# volumes:
-#   postgres_data:
-#   pgadmin_data:
+volumes:
+  pgdata:
