@@ -1,8 +1,10 @@
-import { jest } from "@jest/globals"
-import "@testing-library/jest-dom"
+import { jest } from "@jest/globals";
+import "@testing-library/jest-dom";
 
 // Mock fetch for API calls in tests
-global.fetch = jest.fn()
+global.fetch = jest.fn() as jest.MockedFunction<
+  (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+>;
 
 // Mock next/navigation
 jest.mock("next/navigation", () => ({
@@ -14,4 +16,9 @@ jest.mock("next/navigation", () => ({
   useSearchParams: () => ({
     get: jest.fn(),
   }),
-}))
+}));
+
+// Optional: Clear mocks before each test
+beforeEach(() => {
+  jest.clearAllMocks();
+});
